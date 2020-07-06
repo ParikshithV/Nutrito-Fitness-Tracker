@@ -2,11 +2,11 @@
   <head>
     <link rel="stylesheet" type="text/css" href="nutrito.css">
     <link href='https://fonts.googleapis.com/css?family=Alef' rel='stylesheet'>
-    <title>Nutrito-JS</title>
+    <title>Nutrito: Nutrition Tracker</title>
   </head>
   <body>
     <div>
-      <h1>NutritoJS</h1>
+      <h1>Nutrito: Nutrition Tracker</h1>
       <div>
       <h2>Create new account :</h2>
     </div>
@@ -32,14 +32,12 @@
         <label for="female">Female</label>
         <input type="radio" id="other" name="gender" value="other">
         <label for="other">Other</label><br><br>
-        <label>Enter password : </label>
-        <input class="txtbx" type="password" id="password" name="password" placeholder="   Required" required><br><br>
-        <!-- <label>Confirm password : </label> -->
-        <!-- <input class="txtbx" type="password" id="confPassword" name="confPassword" placeholder="   Required" required><br><br> -->
-        <!-- <button class="btn" type="button" onclick="register()">Submit</button><br> -->
+        <label>New password : </label>
+        <input class="txtbx" type="password" id="password" name="password" placeholder="   Required" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Password must contain at least one number, uppercase letter, lowercase letter & have more than 8 characters" required><br><br>
         <input class="btn" type="submit"/>
     </div>
   </div>
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
   <script>
   function getCookie(cname) {
     var name = cname + "=";
@@ -55,12 +53,25 @@
     }
     return "";
   }
-
-  var un = getCookie("usernameCheck");
-    if (un = 1) {
-      alert("Username is already taken");
-      document.cookie = "usernameCheck= 0";
-    }
+var response = getCookie("resp");
+if (response === "300") {
+  swal({
+  title: "Registration failed",
+  text: "Username is already taken",
+  icon: "error",
+  button: "Ok",
+})
+}
+else if (response === "200") {
+  swal({
+  title: "Registration successful",
+  text: "Welcome to nutrito!",
+  icon: "success",
+})
+.then((value) => {
+  window.location.href = "login";
+})
+}
   </script>
  </body>
 </html>
