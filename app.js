@@ -92,6 +92,10 @@ app.get('/', function(req, res) {
   res.sendFile(path.join(__dirname + '/index.html'));
 });
 
+app.get('/ocr', function(req, res) {
+  res.sendFile(path.join(__dirname + '/basic.html'));
+});
+
 app.get('/nutrito', function(req, res) {
   getData();
    res.cookie('sumPro', sumPro);
