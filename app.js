@@ -30,53 +30,6 @@ const mimetypes = {
     'jpg': 'image/jpg'
 };
 
-
-function getData(){
-  var sql = "SELECT sum(Protein) FROM IntakeData" ;
-  con.query(sql, function (err, rows, result) {
-    if (err) throw err;
-    Object.keys(result).forEach(function(key) {
-      var arr = JSON.stringify(rows[0]);
-      var arred = JSON.parse(arr);
-      // console.log(arred["sum(Protein)"]);
-      sumPro = arred["sum(Protein)"];
-    });
-  })
-
-  var sql = "SELECT sum(Carbohydrates) FROM IntakeData" ;
-  con.query(sql, function (err, rows, result) {
-    if (err) throw err;
-    Object.keys(result).forEach(function(key) {
-      var arr = JSON.stringify(rows[0]);
-      var arred = JSON.parse(arr);
-      // console.log(arred["sum(Carbohydrates)"]);
-      sumCarbs = arred["sum(Carbohydrates)"];
-  });
-  })
-
-  var sql = "SELECT sum(Fat) FROM IntakeData" ;
-  con.query(sql, function (err, rows, result) {
-    if (err) throw err;
-    Object.keys(result).forEach(function(key) {
-      var arr = JSON.stringify(rows[0]);
-      var arred = JSON.parse(arr);
-      // console.log(arred["sum(Fat)"]);
-      sumFat = arred["sum(Fat)"];
-  });
-  })
-
-  var sql = "SELECT sum(Calories) FROM IntakeData" ;
-  con.query(sql, function (err, rows, result) {
-    if (err) throw err;
-    Object.keys(result).forEach(function(key) {
-      var arr = JSON.stringify(rows[0]);
-      var arred = JSON.parse(arr);
-      // console.log(arred["sum(Calories)"]);
-      sumCal = arred["sum(Calories)"];
-  });
-  })
-}
-
 con.connect(function(err) {
   if (err) throw err;
   console.log("Connected!");
@@ -96,8 +49,30 @@ app.get('/ocr', function(req, res) {
   res.sendFile(path.join(__dirname + '/basic.html'));
 });
 
+function getNutriData(dataName, dataFrom){
+    var sql = "SELECT "+dataName+" FROM nutritojs."+dataFrom+"" ;
+    con.query(sql, function (err, rows, result) {
+    if (err) throw err;
+    Object.keys(result).forEach(function(key) {
+      var arr = JSON.stringify(rows[0]);
+      var arred = JSON.parse(arr);
+      //console.log(arred[dataName]);
+      retData = arred[dataName];
+      console.log(dataName+"="+retData);
+      return retData;
+    });
+    })
+  }
+
 app.get('/nutrito', function(req, res) {
-  getData();
+  var userName = userNameSS;
+  //global.userNameSS = userName;
+  console.log("getting "+userName+"'s data");
+  var sumPro = getNutriData("sum(Protein)", userName);
+  var sumCarbs = getNutriData("sum(Carbohydrates)", userName);
+  var sumFat = getNutriData("sum(Fat)", userName);
+  var sumCal = getNutriData("sum(Calories)", userName);
+  console.log("Return check = "+sumCal);
    res.cookie('sumPro', sumPro);
    res.cookie('sumCarbs', sumCarbs);
    res.cookie('sumFat', sumFat);
@@ -124,19 +99,21 @@ app.post('/loginSession', function(req, res) {
     console.log("Login check...");
 
     var sql = "SELECT * FROM userdb where userName = '"+userName+"' and password = '"+password_en+"'" ;
-    con.query(sql, function (error,  results) {
+    con.query(sql, function (error,  results, req) {
     if (error) {
    console.log("error ocurred",error);
       }
       else{
             if(results.length >0)
               {
+                global.userNameSS = userName;
+                res.cookie('userName', userName);
                 res.redirect('nutrito');
                }
         else
           {
             res.cookie('resp', '300', {maxAge: 1000});
-            res.redirect('loginPage');
+            res.redirect('login');
           }
         }
       });
@@ -144,12 +121,13 @@ app.post('/loginSession', function(req, res) {
 
 app.post('/save', urlencodedParser, function(req, res){
     //if (err) throw err;
+    var userName = userNameSS;
     var p = req.body.protein;
     var c = req.body.carbo;
     var f = req.body.fat;
     var inName = req.body.inName;
     var calories = req.body.cal;
-    var sql = "insert into IntakeData (InName, Protein, Carbohydrates, Fat, Calories) values ('"+inName+"','"+p+"','"+c+"','"+f+"','"+calories+"')" ;
+    var sql = "insert into "+userNameSS+" (InName, Protein, Carbohydrates, Fat, Calories) values ('"+inName+"','"+p+"','"+c+"','"+f+"','"+calories+"')" ;
     con.query(sql, function (err, result) {
       if (err) throw err;
       console.log("input saved!");
