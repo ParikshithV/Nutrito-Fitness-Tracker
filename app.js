@@ -14,6 +14,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
 // app.use(session({secret: "Shh, its a secret!"}));
+
+global.userLogin = 0;
+
 var con = mysql.createConnection({
   host: "localhost",
   user: "root",
@@ -49,35 +52,73 @@ app.get('/ocr', function(req, res) {
   res.sendFile(path.join(__dirname + '/basic.html'));
 });
 
-function getNutriData(dataName, dataFrom){
-    var sql = "SELECT "+dataName+" FROM nutritojs."+dataFrom+"" ;
-    con.query(sql, function (err, rows, result) {
-    if (err) throw err;
-    Object.keys(result).forEach(function(key) {
-      var arr = JSON.stringify(rows[0]);
-      var arred = JSON.parse(arr);
-      //console.log(arred[dataName]);
-      retData = arred[dataName];
-      console.log(dataName+"="+retData);
-      return retData;
-    });
-    })
-  }
+function sleep(ms) {
+ return new Promise(
+	resolve => setTimeout(resolve, ms)
+ );
+}
 
 app.get('/nutrito', function(req, res) {
-  var userName = userNameSS;
-  //global.userNameSS = userName;
-  console.log("getting "+userName+"'s data");
-  var sumPro = getNutriData("sum(Protein)", userName);
-  var sumCarbs = getNutriData("sum(Carbohydrates)", userName);
-  var sumFat = getNutriData("sum(Fat)", userName);
-  var sumCal = getNutriData("sum(Calories)", userName);
-  console.log("Return check = "+sumCal);
-   res.cookie('sumPro', sumPro);
-   res.cookie('sumCarbs', sumCarbs);
-   res.cookie('sumFat', sumFat);
-   res.cookie('sumCal', sumCal);
-   res.sendFile(path.join(__dirname + '/homepage.html'));
+  if (userLogin == 1){
+    var userName = userNameSS;
+    console.log("getting "+userName+"'s data");
+  function cookieData(){
+        var sql = "SELECT sum(Protein) FROM IntakeData" ;
+        con.query(sql, function (err, rows, result) {
+          if (err) throw err;
+          Object.keys(result).forEach(function(key) {
+            var arr = JSON.stringify(rows[0]);
+            var arred = JSON.parse(arr);
+            // console.log(arred["sum(Protein)"]);
+            var sumPro = arred["sum(Protein)"];
+            res.cookie('sumPro', sumPro);
+          });
+        })
+
+        var sql = "SELECT sum(Carbohydrates) FROM IntakeData" ;
+        con.query(sql, function (err, rows, result) {
+          if (err) throw err;
+            Object.keys(result).forEach(function(key) {
+              var arr = JSON.stringify(rows[0]);
+              var arred = JSON.parse(arr);
+              // console.log(arred["sum(Carbohydrates)"]);
+              var sumCarbs = arred["sum(Carbohydrates)"];
+              res.cookie('sumCarbs', sumCarbs);
+          });
+        })
+
+        var sql = "SELECT sum(Fat) FROM IntakeData" ;
+        con.query(sql, function (err, rows, result) {
+          if (err) throw err;
+            Object.keys(result).forEach(function(key) {
+              var arr = JSON.stringify(rows[0]);
+              var arred = JSON.parse(arr);
+              // console.log(arred["sum(Fat)"]);
+              var sumFat = arred["sum(Fat)"];
+              res.cookie('sumFat', sumFat);
+          });
+        })
+
+        var sql = "SELECT sum(Calories) FROM IntakeData" ;
+        con.query(sql, function (err, rows, result) {
+          if (err) throw err;
+            Object.keys(result).forEach(function(key) {
+              var arr = JSON.stringify(rows[0]);
+              var arred = JSON.parse(arr);
+              // console.log(arred["sum(Calories)"]);
+              var sumCal = arred["sum(Calories)"];
+              res.cookie('sumCal', sumCal);
+          });
+        })
+       console.log("Sending user data");
+       // res.sendFile(path.join(__dirname + '/homepage.html'));
+    }
+    cookieData();
+    sleep(2000).then(() => { res.sendFile(path.join(__dirname + '/homepage.html')); });
+  }
+   else {
+     res.sendFile(path.join(__dirname + '/loginPage.html'));
+   }
 });
 
 app.get('/about', function(req, res) {
@@ -107,11 +148,13 @@ app.post('/loginSession', function(req, res) {
             if(results.length >0)
               {
                 global.userNameSS = userName;
+                global.userLogin = 1;
                 res.cookie('userName', userName);
                 res.redirect('nutrito');
                }
         else
           {
+            global.userLogin = 0;
             res.cookie('resp', '300', {maxAge: 1000});
             res.redirect('login');
           }
@@ -132,7 +175,7 @@ app.post('/save', urlencodedParser, function(req, res){
       if (err) throw err;
       console.log("input saved!");
     })
-  res.sendFile(path.join(__dirname + '/homepage.html'));
+  res.sendFile(path.join(__dirname + '/redirect.html'));
 })
 
 app.post('/signup', urlencodedParser, function(req, res){
