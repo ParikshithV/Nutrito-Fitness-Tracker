@@ -36,7 +36,7 @@ const mimetypes = {
 con.connect(function(err) {
   if (err) throw err;
   console.log("Connected!");
-  var sql1 = "CREATE TABLE IF NOT EXISTS userdb (userName VARCHAR(255), email VARCHAR(255), age VARCHAR(15), height VARCHAR(55), weight VARCHAR(55), gender VARCHAR(55), password VARCHAR(255))";
+  var sql1 = "CREATE TABLE IF NOT EXISTS nutritojs.userdb (userName VARCHAR(255), email VARCHAR(255), age VARCHAR(15), height VARCHAR(55), weight VARCHAR(55), gender VARCHAR(55), password VARCHAR(255))";
 
   con.query(sql1, function (err, result) {
     if (err) throw err;
@@ -62,8 +62,12 @@ app.get('/nutrito', function(req, res) {
   if (userLogin == 1){
     var userName = userNameSS;
     console.log("getting "+userName+"'s data");
+    var dbSql = "CREATE SCHEMA IF NOT EXISTS "+userName;
+    con.query(dbSql, function (err, result) {
+      if (err) throw err;
+    })
   function cookieData(){
-        var sql = "SELECT sum(Protein) FROM IntakeData" ;
+        var sql = "SELECT sum(Protein) FROM "+userName+".nutriTrack" ;
         con.query(sql, function (err, rows, result) {
           if (err) throw err;
           Object.keys(result).forEach(function(key) {
@@ -75,7 +79,7 @@ app.get('/nutrito', function(req, res) {
           });
         })
 
-        var sql = "SELECT sum(Carbohydrates) FROM IntakeData" ;
+        var sql = "SELECT sum(Carbohydrates) FROM "+userName+".nutriTrack" ;
         con.query(sql, function (err, rows, result) {
           if (err) throw err;
             Object.keys(result).forEach(function(key) {
@@ -87,7 +91,7 @@ app.get('/nutrito', function(req, res) {
           });
         })
 
-        var sql = "SELECT sum(Fat) FROM IntakeData" ;
+        var sql = "SELECT sum(Fat) FROM "+userName+".nutriTrack" ;
         con.query(sql, function (err, rows, result) {
           if (err) throw err;
             Object.keys(result).forEach(function(key) {
@@ -99,7 +103,7 @@ app.get('/nutrito', function(req, res) {
           });
         })
 
-        var sql = "SELECT sum(Calories) FROM IntakeData" ;
+        var sql = "SELECT sum(Calories) FROM "+userName+".nutriTrack" ;
         con.query(sql, function (err, rows, result) {
           if (err) throw err;
             Object.keys(result).forEach(function(key) {
@@ -150,6 +154,15 @@ app.post('/loginSession', function(req, res) {
                 global.userNameSS = userName;
                 global.userLogin = 1;
                 res.cookie('userName', userName);
+                var dbSql = "CREATE SCHEMA IF NOT EXISTS "+userName;
+                con.query(dbSql, function (err, result) {
+                  if (err) throw err;
+                })
+                var dbSqlTable = "CREATE TABLE IF NOT EXISTS "+userName+".nutriTrack (Date VARCHAR(10), InName VARCHAR(255), Protein VARCHAR(55), Carbohydrates VARCHAR(55), Fat VARCHAR(55), Calories VARCHAR(55))";
+                con.query(dbSqlTable, function (err, result) {
+                  if (err) throw err;
+                  console.log("input saved!");
+                })
                 res.redirect('nutrito');
                }
         else
@@ -165,12 +178,24 @@ app.post('/loginSession', function(req, res) {
 app.post('/save', urlencodedParser, function(req, res){
     //if (err) throw err;
     var userName = userNameSS;
+    var inpDate = req.body.inDate;
     var p = req.body.protein;
     var c = req.body.carbo;
     var f = req.body.fat;
     var inName = req.body.inName;
     var calories = req.body.cal;
-    var sql = "insert into "+userNameSS+" (InName, Protein, Carbohydrates, Fat, Calories) values ('"+inName+"','"+p+"','"+c+"','"+f+"','"+calories+"')" ;
+
+    var nutritrack = "CREATE TABLE IF NOT EXISTS nutritojs."+userName+" (InName VARCHAR(255), Protein VARCHAR(55), Carbohydrates VARCHAR(55), Fat VARCHAR(55), Calories VARCHAR(55))";
+    con.query(nutritrack, function (err, result) {
+      if (err) throw err;
+    })
+
+    var dbSqlTable = "CREATE TABLE IF NOT EXISTS "+userName+".nutriTrack (Date VARCHAR(10), InName VARCHAR(255), Protein VARCHAR(55), Carbohydrates VARCHAR(55), Fat VARCHAR(55), Calories VARCHAR(55))";
+    con.query(dbSqlTable, function (err, result) {
+      if (err) throw err;
+    })
+
+    var sql = "insert into "+userName+".nutriTrack (Date, InName, Protein, Carbohydrates, Fat, Calories) values ('"+inpDate+"','"+inName+"','"+p+"','"+c+"','"+f+"','"+calories+"')" ;
     con.query(sql, function (err, result) {
       if (err) throw err;
       console.log("input saved!");

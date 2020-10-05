@@ -16,7 +16,9 @@
     <div style="display:none;" id="nutri">
       <form action="save" method="post">
       <h3>Add nutrition intake data :</h5>
-        <label>Intake Nickname : </label>
+        <label>Date : </label>
+        <input class="txtbx" type="text" id="inDate" name="inDate" placeholder="dd-mm-yyy" required><br>
+        <label>Intake Name : </label>
         <input class="txtbx" type="text" id="inName" name="inName" required><br><br>
         <label>Enter intake data (in grams per serve) :</label><br>
         <input class="txtbx2" type="text" id="protein" name="protein" placeholder="Protein" required>
@@ -51,7 +53,7 @@
     </script>
     <br>
     <h3 style="margin-left: 2%">Nutrition intake tracking:</h5>
-      <button class="btn" style="margin-left: 2%" onClick="location.href='nutrito'">Refresh Data</button><br><br>
+      <button class="btn" style="margin-left: 2%" onClick="location.href='nutrito'">Refresh Data</button>
     <div class="graph">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
     <canvas id="myChart" width="10" height="8"></canvas>
@@ -106,10 +108,22 @@
       });
 
       function showForm(){
+        todayDate();
         document.getElementById("nutri").style.display = "block";
         document.getElementById("manualButton").style.display = "none";
         document.getElementById("ocrButton").style.display = "none";
         document.getElementById("dataInput").style.display = "none";
+      }
+
+      function todayDate(){
+        var d = new Date();
+        var tdate = d.getDate();
+        var month  = d.getMonth();
+        var aMonth = month+1;
+        var year = d.getFullYear();
+        var fullDate = "0"+tdate+"-"+aMonth+"-"+year+"";
+        // alert("Data will be stored for "+fullDate);
+        document.getElementById("inDate").value = fullDate;
       }
 
     </script>
