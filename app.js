@@ -185,10 +185,10 @@ app.post('/save', urlencodedParser, function(req, res){
     var inName = req.body.inName;
     var calories = req.body.cal;
 
-    var nutritrack = "CREATE TABLE IF NOT EXISTS nutritojs."+userName+" (InName VARCHAR(255), Protein VARCHAR(55), Carbohydrates VARCHAR(55), Fat VARCHAR(55), Calories VARCHAR(55))";
-    con.query(nutritrack, function (err, result) {
-      if (err) throw err;
-    })
+    // var nutritrack = "CREATE TABLE IF NOT EXISTS nutritojs."+userName+" (InName VARCHAR(255), Protein VARCHAR(55), Carbohydrates VARCHAR(55), Fat VARCHAR(55), Calories VARCHAR(55))";
+    // con.query(nutritrack, function (err, result) {
+    //   if (err) throw err;
+    // })
 
     var dbSqlTable = "CREATE TABLE IF NOT EXISTS "+userName+".nutriTrack (Date VARCHAR(10), InName VARCHAR(255), Protein VARCHAR(55), Carbohydrates VARCHAR(55), Fat VARCHAR(55), Calories VARCHAR(55))";
     con.query(dbSqlTable, function (err, result) {
