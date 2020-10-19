@@ -8,4 +8,5 @@ To get started,
 5. Run `npm start` (front-end) from the *frontend* directory
 
 Front-end is run on port 3000
+
 Back-end uses port 8080
