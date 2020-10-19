@@ -7,5 +7,5 @@ To get started,
 4. Run `nodemon app.js` (back-end) from the *Nutrito-Fitness-Tracker* directory
 5. Run `npm start` (front-end) from the *frontend* directory
 
-Front-end is run on port 3000,  
+Front-end uses port 3000,  
 Back-end uses port 8080
