@@ -3,7 +3,7 @@
 To get started,
 1. Run local server of your preference (I used WAMP)
 2. Create a schema (database) named **nutritojs** on mysql
-3. Run `npm install` on *Nutrito-Fitness-Tracker* and *frontend* directory
+3. Run `npm install` on *Nutrito-Fitness-Tracker* and *frontend* directories
 4. Run `nodemon app.js` (back-end) from the *Nutrito-Fitness-Tracker* directory
 5. Run `npm start` (front-end) from the *frontend* directory
 
